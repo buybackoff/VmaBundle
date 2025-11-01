@@ -41,12 +41,17 @@ for RID in "${!RID_MAP[@]}"; do
     echo "===================================================================="
     echo ""
 
-    # Call the build_vma_bundle.sh script
-    # The fourth argument '1' ensures the tar is unpacked and deleted
-    bash "${BUILD_SCRIPT}" "${DISTRO}" "${OUTPUT_DIR}" "${LIBVMA_BRANCH_VERSION}" 1
-    if [ $? -ne 0 ]; then
-        echo "Error: Build for ${RID} failed. Aborting."
-        exit 1
+    LIBVMA_SO_PATH="${OUTPUT_DIR}/vma/libvma.so"
+    if [ -f "${LIBVMA_SO_PATH}" ]; then
+        echo "--- libvma.so already exists for ${RID}. Skipping build. ---"
+    else
+        # Call the build_vma_bundle.sh script
+        # The fourth argument '1' ensures the tar is unpacked and deleted
+        bash "${BUILD_SCRIPT}" "${DISTRO}" "${OUTPUT_DIR}" "${LIBVMA_BRANCH_VERSION}" 1
+        if [ $? -ne 0 ]; then
+            echo "Error: Build for ${RID} failed. Aborting."
+            exit 1
+        fi
     fi
 
     DUMMY_FILE_PATH="${OUTPUT_DIR}/vma/${RID}"

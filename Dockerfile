@@ -2,7 +2,7 @@ ARG BASE_IMAGE=debian:13
 
 FROM ${BASE_IMAGE} AS build
 
-RUN apt update && apt install -y \
+RUN apt update  -qq && apt install -y -qq \
     build-essential autoconf automake libtool pkg-config git \
     rdma-core libibverbs-dev librdmacm-dev libnl-3-dev libnl-route-3-dev && \
     apt-get clean && \
