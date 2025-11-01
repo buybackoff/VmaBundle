@@ -14,7 +14,7 @@ LIBVMA_BRANCH_VERSION=$1
 
 # Define RIDs and their corresponding Docker base images
 declare -A RID_MAP
-RID_MAP["ubuntu.25.10-x64"]="ubuntu:25.10"
+RID_MAP["ubuntu.25-x64"]="ubuntu:25.10"
 RID_MAP["debian.13-x64"]="debian:13"
 RID_MAP["debian.12-x64"]="debian:12"
 RID_MAP["linux-x64"]="debian:11" # As per VmaBundle.Native.nuspec description
@@ -48,6 +48,10 @@ for RID in "${!RID_MAP[@]}"; do
         echo "Error: Build for ${RID} failed. Aborting."
         exit 1
     fi
+
+    DUMMY_FILE_PATH="${OUTPUT_DIR}/vma/${RID}"
+    # Create dummy file for debugging, ignore if exists or fails
+    touch "${DUMMY_FILE_PATH}" || true
 done
 
 echo ""

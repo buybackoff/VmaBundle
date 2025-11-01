@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian:13
-ARG LIBVMA_BRANCH_VERSION=9.8.72 # Default branch version for libvma
+
 FROM ${BASE_IMAGE} AS build
 
 RUN apt update && apt install -y \
@@ -11,7 +11,8 @@ RUN apt update && apt install -y \
 WORKDIR /src
 
 # clone layer — cached unless ARG changes
-RUN git clone --branch ${LIBVMA_BRANCH_VERSION} --depth=1 https://github.com/Mellanox/libvma.git
+ARG LIBVMA_BRANCH_VERSION=9.8.72 # Default branch version for libvma
+RUN git clone --depth=1 --branch ${LIBVMA_BRANCH_VERSION} https://github.com/Mellanox/libvma.git
 
 # build and install — runs only if clone layer changes
 RUN cd libvma && \
