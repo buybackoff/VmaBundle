@@ -2,3 +2,5 @@
 *.gz
 *.zip
 *.nuget
+output
+runtimes

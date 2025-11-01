@@ -1,0 +1,7 @@
+{
+  "runtimes": {
+    "ubuntu.25-x64": { "inherits": [ "debian.13-x64" ] },
+    "debian.13-x64": { "inherits": [ "debian.12-x64" ] },
+    "debian.12-x64": { "inherits": [ "linux-x64" ] }
+  }
+}
