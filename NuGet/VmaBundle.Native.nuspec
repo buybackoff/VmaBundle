@@ -38,6 +38,6 @@
 
   <files>
     <!-- Optional: include RID fallback graph if needed -->
-    <file src="../runtime.json" target="runtime.json" />
+    <file src="runtime.json" target="runtime.json" />
   </files>
 </package>
