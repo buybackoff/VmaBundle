@@ -1,7 +1,6 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>VmaBundle.Native</id>
-    <version>0.1.0</version>
     <title>Userspace VMA bundle for Debian family distros (Meta)</title>
     <authors>Victor Baybekov</authors>
     <projectUrl>https://github.com/buybackoff/VmaBundle</projectUrl>
@@ -22,16 +21,16 @@
 
     <dependencies>
       <group targetFramework="netstandard2.0" runtime="ubuntu.25.10-x64">
-        <dependency id="VmaBundle.ubuntu.25-x64" version="0.1.0" />
+        <dependency id="VmaBundle.ubuntu.25-x64" />
       </group>
       <group targetFramework="netstandard2.0" runtime="debian.13-x64">
-        <dependency id="VmaBundle.debian.13-x64" version="0.1.0" />
+        <dependency id="VmaBundle.debian.13-x64" />
       </group>
       <group targetFramework="netstandard2.0" runtime="debian.12-x64">
-        <dependency id="VmaBundle.debian.12-x64" version="0.1.0" />
+        <dependency id="VmaBundle.debian.12-x64" />
       </group>
       <group targetFramework="netstandard2.0" runtime="linux-x64">
-        <dependency id="VmaBundle.linux-x64" version="0.1.0" />
+        <dependency id="VmaBundle.linux-x64" />
       </group>
     </dependencies>
   </metadata>

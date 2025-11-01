@@ -1,16 +1,17 @@
 #!/bin/bash
 
 # Check if required arguments are provided
-if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
-    echo "Usage: $0 <distro docker image> <output_folder> [extract and delete tar (0/1, default: 1)]"
-    echo "Example: $0 debian:12 ./output/debian12"
-    echo "Example: $0 ubuntu:25.10 ./output/ubuntu2510 0"
+if [ "$#" -lt 3 ] || [ "$#" -gt 4 ]; then
+    echo "Usage: $0 <distro docker image> <output_folder> <libvma_branch_version> [extract and delete tar (0/1, default: 1)]"
+    echo "Example: $0 debian:12 ./output/debian12 9.8.72"
+    echo "Example: $0 ubuntu:25.10 ./output/ubuntu2510 9.8.72 0"
     exit 1
 fi
 
 DISTRO=$1
 OUTPUT_FOLDER=$2
-UNPACK_AND_DELETE=${3:-1} # Default to 1 (true) if not provided
+LIBVMA_BRANCH_VERSION=$3
+UNPACK_AND_DELETE=${4:-1} # Default to 1 (true) if not provided
 
 # Sanitize distro name for image tag and container name
 SANITIZED_DISTRO=$(echo "$DISTRO" | sed 's/[^a-zA-Z0-9_.-]/_/g')
@@ -19,8 +20,8 @@ CONTAINER_NAME="tmp-vma-builder-${SANITIZED_DISTRO}"
 BUNDLE_FILENAME="vma-bundle.tar.gz"
 OUTPUT_BUNDLE_PATH="${OUTPUT_FOLDER}/${BUNDLE_FILENAME}" # Path for bundle in output folder
 
-echo "--- Building Docker image for distro: ${DISTRO} ---"
-docker build --build-arg BASE_IMAGE="${DISTRO}" -t "${IMAGE_TAG}" .
+echo "--- Building Docker image for distro: ${DISTRO} (VMA Branch: ${LIBVMA_BRANCH_VERSION}) ---"
+docker build --build-arg BASE_IMAGE="${DISTRO}" --build-arg LIBVMA_BRANCH_VERSION="${LIBVMA_BRANCH_VERSION}" -t "${IMAGE_TAG}" .
 if [ $? -ne 0 ]; then
     echo "Docker build failed."
     exit 1

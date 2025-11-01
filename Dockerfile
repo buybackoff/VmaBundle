@@ -1,4 +1,5 @@
 ARG BASE_IMAGE=debian:13
+ARG LIBVMA_BRANCH_VERSION=9.8.72 # Default branch version for libvma
 FROM ${BASE_IMAGE} AS build
 
 RUN apt update && apt install -y \
@@ -8,8 +9,12 @@ RUN apt update && apt install -y \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
-RUN git clone --branch 9.8.72 --depth=1 https://github.com/Mellanox/libvma.git && \
-    cd libvma && \
+
+# clone layer — cached unless ARG changes
+RUN git clone --branch ${LIBVMA_BRANCH_VERSION} --depth=1 https://github.com/Mellanox/libvma.git
+
+# build and install — runs only if clone layer changes
+RUN cd libvma && \
     cp LICENSE /src/libvma.LICENSE && \
     ./autogen.sh && \
     ./configure --prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu && \
@@ -66,3 +71,6 @@ COPY --from=build /opt/vma-bundle.tar.gz /export/vma-bundle.tar.gz
 # docker create --name tmp-ubuntu2510 vma-builder-ubuntu2510
 # docker cp tmp-ubuntu2510:/export/vma-bundle.tar.gz .
 # docker rm tmp-ubuntu2510
+
+# Cleanup images
+# podman image prune -a -f

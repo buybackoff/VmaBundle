@@ -1,7 +1,6 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>VmaBundle.ubuntu.25-x64</id>
-    <version>0.1.0</version>
     <authors>Victor Baybekov</authors>
     <description>Userspace Mellanox VMA bundle for Debian family distros.</description>
     <license type="expression">GPL-2.0-or-later</license>
