@@ -6,6 +6,16 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <!-- Native AOT / single-file settings (commented out; enable as needed)
+        <PublishAot>true</PublishAot>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <StripSymbols>true</StripSymbols>
+        <IlcGenerateNativeDebugInfo>false</IlcGenerateNativeDebugInfo>
+        <OptimizationPreference>Speed</OptimizationPreference>
+        <TrimMode>full</TrimMode>
+        <SelfContained>true</SelfContained>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        -->
     </PropertyGroup>
 
     <ItemGroup>
