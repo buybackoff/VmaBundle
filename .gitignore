@@ -3,4 +3,4 @@
 *.zip
 *.nuget
 output
-runtimes
+proxy.pem

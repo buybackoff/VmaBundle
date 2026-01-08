@@ -1,7 +1,5 @@
 # VmaBundle
 
-WIP
-
 For VMA to work, only kernel mods are required. Normally they are loaded automatically when Mellanox cards are present.
 
 The rest is userspace libraries.
@@ -41,8 +39,18 @@ podman image prune -a -f
 ## Build scripts
 
 * build_vma_bundle.sh - builds the bundle for a given distro and libvma version
-* build_all_rids.sh - builds the bundle for all RIDs via `build_vma_bundle.sh`
-* build.sh - builds the bundle for all RIDs via `build_all_rids.sh` and packs then in NuGets
+
+```sh
+# This works fine from WSL, directly from Podman Desktop WSL distro
+# If it's the default WSL distro, just run wsl in Explorer's address bar, or go to mnt/c/path/to/this/repo
+./build_vma_bundle.sh debian:13 ./output/debian13 9.8.80
+```
+
+TODO Need a separate script build_nuget.sh/build_nuget.cmd
+On Windows, it's nuget pack NuGet\VmaBundle.template.nuspec -OutputDirectory output -Version 0.4.9880 -Properties distro=debian13
+
+* build_all_distros.sh - builds the bundle for all supported distros via `build_vma_bundle.sh`.
+* build_nugets.cmd - builds NuGets packages.
 
 ## Run with LD_PRELOAD
 
@@ -56,3 +64,7 @@ or prefer extracted ones
 ```sh
 export LD_LIBRARY_PATH=/opt/vma/lib:$LD_LIBRARY_PATH
 ```
+
+## Proxy
+
+To clone libvma, a TLS certificate for a proxy may be required. Place it in the root of this repo as `proxy.pem` or `proxy.crt`.

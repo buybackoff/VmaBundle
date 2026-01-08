@@ -2,6 +2,19 @@ ARG BASE_IMAGE=debian:13
 
 FROM ${BASE_IMAGE} AS build
 
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Apply proxy certificate if present. Need to copy Dockerfile as an anchor to make copy reliable.
+COPY Dockerfile proxy.pem* proxy.crt* /tmp/
+RUN set -e; \
+    if [ -f /tmp/proxy.pem ]; then \
+      cp /tmp/proxy.pem /usr/local/share/ca-certificates/proxy.crt; \
+      update-ca-certificates; \
+    elif [ -f /tmp/proxy.crt ]; then \
+      cp /tmp/proxy.crt /usr/local/share/ca-certificates/proxy.crt; \
+      update-ca-certificates; \
+    fi
+
 RUN apt-get update -qq > /dev/null && \
     apt-get install -y -qq \
         build-essential autoconf automake libtool pkg-config git \
@@ -13,7 +26,7 @@ RUN apt-get update -qq > /dev/null && \
 WORKDIR /src
 
 # clone layer — cached unless ARG changes
-ARG LIBVMA_BRANCH_VERSION=9.8.72 # Default branch version for libvma
+ARG LIBVMA_BRANCH_VERSION=9.8.80 # Default branch version for libvma
 RUN git clone --depth=1 --branch ${LIBVMA_BRANCH_VERSION} https://github.com/Mellanox/libvma.git
 
 # build and install — runs only if clone layer changes

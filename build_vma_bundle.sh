@@ -3,8 +3,8 @@
 # Check if required arguments are provided
 if [ "$#" -lt 3 ] || [ "$#" -gt 4 ]; then
     echo "Usage: $0 <distro docker image> <output_folder> <libvma_branch_version> [extract and delete tar (0/1, default: 1)]"
-    echo "Example: $0 debian:12 ./output/debian12 9.8.72"
-    echo "Example: $0 ubuntu:25.10 ./output/ubuntu2510 9.8.72 0"
+    echo "Example: $0 debian:13 ./output/debian13 9.8.80"
+    echo "Example: $0 ubuntu:25.10 ./output/ubuntu2510 9.8.80 0"
     exit 1
 fi
 

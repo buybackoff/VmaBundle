@@ -1,11 +1,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>VmaBundle.debian.12-x64</id>
+    <id>VmaBundle.$distro$</id>
+    <version>$version$</version>
     <authors>Victor Baybekov</authors>
+    <copyright>Copyright © 2025 Victor Baybekov</copyright>
     <description>Userspace VMA bundle for Debian family distros.</description>
     <license type="expression">GPL-2.0-or-later</license>
   </metadata>
+
   <files>
-    <file src="runtimes/debian.12-x64/native/**/*" target="runtimes/debian.12-x64/native/" />
+    <file src="VmaBundle.targets" target="buildTransitive\VmaBundle.$distro$.targets" />
+    <file src="..\output\$distro$\vma\**" target="vmabundle\$distro$\" />
   </files>
 </package>
