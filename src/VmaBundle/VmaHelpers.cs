@@ -1,9 +1,11 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace VmaBundle;
@@ -191,7 +193,7 @@ public static class VmaHelpers
             return currentLdPreload;
 
         // Check if libvma is already in LD_PRELOAD
-        if (!currentIsEmpty && currentLdPreload.Contains("libvma"))
+        if (!currentIsEmpty && currentLdPreload!.Contains("libvma"))
             return currentLdPreload;
 
         // Add libvma.so to LD_PRELOAD

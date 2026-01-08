@@ -2,8 +2,25 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
+        <ImplicitUsings>false</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>VmaBundle</PackageId>
+        <Version>0.1.9880</Version>
+        <Authors>Victor Baybekov</Authors>
+        <Company>Victor Baybekov</Company>
+        <PackageLicenseExpression>GPL-2.0-or-later</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/buybackoff/VmaBundle</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/buybackoff/VmaBundle</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Description>VMA bundle helpers. A bundle must be added separatetly to your project, see VmaBundle.distro packages.</Description>
+        <PackageTags>vma;networking;rdma;infiniband;linux;debian;ubuntu;performance</PackageTags>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageReadmeFile>docs/Readme.md</PackageReadmeFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- README bundled into the nupkg -->
+        <None Include="..\..\Readme.md" Pack="true" PackagePath="docs/Readme.md" Visible="false" />
+    </ItemGroup>
 
 </Project>

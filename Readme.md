@@ -46,9 +46,6 @@ podman image prune -a -f
 ./build_vma_bundle.sh debian:13 ./output/debian13 9.8.80
 ```
 
-TODO Need a separate script build_nuget.sh/build_nuget.cmd
-On Windows, it's nuget pack NuGet\VmaBundle.template.nuspec -OutputDirectory output -Version 0.4.9880 -Properties distro=debian13
-
 * build_all_distros.sh - builds the bundle for all supported distros via `build_vma_bundle.sh`.
 * build_nugets.cmd - builds NuGets packages.
 
