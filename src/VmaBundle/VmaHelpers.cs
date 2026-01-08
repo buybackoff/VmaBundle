@@ -2,13 +2,21 @@
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Globalization;
+using System.Threading.Tasks;
 
 namespace VmaBundle;
 
 public static class VmaHelpers
 {
+    private static bool? _hasRawSocketsCache;
+
     private static bool CheckRawSocketsCapability()
     {
+        if (_hasRawSocketsCache.HasValue)
+            return _hasRawSocketsCache.Value;
+
         // This method attempts to send a minimal ICMP echo request using a raw socket.
         // On Linux this requires CAP_NET_RAW; without it, the Socket operations will
         // fail with a permission error. We report success/failure but do not throw.
@@ -30,6 +38,7 @@ public static class VmaHelpers
 
             socket.SendTo(packet, endPoint);
 
+            _hasRawSocketsCache = true;
             return true;
         }
         catch
@@ -37,6 +46,7 @@ public static class VmaHelpers
             // ignored
         }
 
+        _hasRawSocketsCache = false;
         return false;
     }
 
@@ -143,11 +153,11 @@ public static class VmaHelpers
         if (libVmaPath == null)
             return null;
 
+        var currentLdLibraryPath = Environment.GetEnvironmentVariable("LD_LIBRARY_PATH");
+
         var vmaLibDir = Path.GetDirectoryName(libVmaPath);
         if (vmaLibDir == null)
-            return null;
-
-        var currentLdLibraryPath = Environment.GetEnvironmentVariable("LD_LIBRARY_PATH");
+            return currentLdLibraryPath;
 
         if (preferSystem)
         {
@@ -178,7 +188,7 @@ public static class VmaHelpers
         var libVmaPath = GetLibVmaPath();
 
         if (libVmaPath == null)
-            return currentIsEmpty ? null : currentLdPreload;
+            return currentLdPreload;
 
         // Check if libvma is already in LD_PRELOAD
         if (!currentIsEmpty && currentLdPreload.Contains("libvma"))
@@ -228,7 +238,8 @@ public static class VmaHelpers
     /// <returns>String in format "VMA_STATS_FILE=path"</returns>
     public static string GetVmaStatsFileEnv(string statsFilePath) => $"VMA_STATS_FILE={statsFilePath}";
 
-    private static VmaApi? _vmaApiCache;
+    private static VmaApi _vmaApiCache;
+    private static bool? _hasVmaApiCache;
 
     /// <summary>
     /// Retrieves the VMA API pointer using getsockopt(SO_VMA_GET_API) and marshals it to <see cref="VmaApi"/>.
@@ -240,10 +251,10 @@ public static class VmaHelpers
     {
         api = default;
 
-        if (_vmaApiCache.HasValue)
+        if (_hasVmaApiCache.HasValue)
         {
-            api = _vmaApiCache.Value;
-            return true;
+            api = _vmaApiCache;
+            return _hasVmaApiCache.Value;
         }
 
         if (!OperatingSystem.IsLinux())
@@ -268,10 +279,12 @@ public static class VmaHelpers
             var apiPtr = new IntPtr(ptrValue);
             api = Marshal.PtrToStructure<VmaApi>(apiPtr);
             _vmaApiCache = api;
+            _hasVmaApiCache = true;
             return true;
         }
         catch
         {
+            _hasVmaApiCache = false;
             return false;
         }
     }
@@ -300,5 +313,62 @@ public static class VmaHelpers
         {
             return false;
         }
+    }
+
+    public static int RunWithVmaShim(Func<string[], int> main, string[] args)
+    {
+        if (main == null)
+            throw new ArgumentNullException(nameof(main));
+
+        if (!OperatingSystem.IsLinux())
+            return main(args);
+
+        if (Environment.GetEnvironmentVariable("VMA_SHIM_ACTIVE") == "1")
+            return main(args);
+
+        if (IsLibVmaLoaded())
+            return main(args);
+
+        var ldLibraryPath = GetLdLibraryPath(false);
+        if (string.IsNullOrWhiteSpace(ldLibraryPath))
+            return main(args);
+
+        if (!CheckRawSocketsCapability())
+            return main(args);
+
+        var ldPreload = GetLdPreload();
+        if (string.IsNullOrWhiteSpace(ldPreload))
+            return main(args);
+
+        var processPath = Environment.ProcessPath ?? Assembly.GetExecutingAssembly().Location;
+        if (string.IsNullOrWhiteSpace(processPath))
+            return main(args);
+
+        var psi = new ProcessStartInfo(processPath)
+        {
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true,
+        };
+
+        foreach (var arg in args)
+            psi.ArgumentList.Add(arg);
+
+        psi.EnvironmentVariables["LD_LIBRARY_PATH"] = ldLibraryPath;
+        psi.EnvironmentVariables["LD_PRELOAD"] = ldPreload;
+        psi.EnvironmentVariables["VMA_TRACELEVEL"] = ((int)VmaTraceLevel.Info).ToString(CultureInfo.InvariantCulture);
+        psi.EnvironmentVariables["VMA_SHIM_ACTIVE"] = "1";
+
+        using var process = Process.Start(psi);
+        if (process == null)
+            return main(args);
+
+        var stdoutTask = process.StandardOutput.BaseStream.CopyToAsync(Console.OpenStandardOutput());
+        var stderrTask = process.StandardError.BaseStream.CopyToAsync(Console.OpenStandardError());
+
+        process.WaitForExit();
+        Task.WaitAll(stdoutTask, stderrTask);
+        return process.ExitCode;
     }
 }
