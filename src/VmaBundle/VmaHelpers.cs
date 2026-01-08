@@ -228,18 +228,23 @@ public static class VmaHelpers
     /// <returns>String in format "VMA_STATS_FILE=path"</returns>
     public static string GetVmaStatsFileEnv(string statsFilePath) => $"VMA_STATS_FILE={statsFilePath}";
 
+    private static VmaApi? _vmaApiCache;
+
     /// <summary>
     /// Retrieves the VMA API pointer using getsockopt(SO_VMA_GET_API) and marshals it to <see cref="VmaApi"/>.
     /// </summary>
     /// <param name="socket">Socket used to issue the getsockopt call.</param>
     /// <param name="api">Populated VMA API struct when available.</param>
     /// <returns>True when VMA is present and the API pointer was resolved.</returns>
-    internal static bool TryGetVmaApi(Socket socket, out VmaApi api)
+    private static bool TryGetVmaApi(out VmaApi api)
     {
         api = default;
 
-        if (socket == null)
-            throw new ArgumentNullException(nameof(socket));
+        if (_vmaApiCache.HasValue)
+        {
+            api = _vmaApiCache.Value;
+            return true;
+        }
 
         if (!OperatingSystem.IsLinux())
             return false;
@@ -250,7 +255,7 @@ public static class VmaHelpers
 
             const int SOL_SOCKET = 1;
             const int SO_VMA_GET_API = 2800;
-
+            using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             var result = socket.GetRawSocketOption(SOL_SOCKET, SO_VMA_GET_API, opt);
             if (result != 0)
                 return false;
@@ -262,6 +267,7 @@ public static class VmaHelpers
 
             var apiPtr = new IntPtr(ptrValue);
             api = Marshal.PtrToStructure<VmaApi>(apiPtr);
+            _vmaApiCache = api;
             return true;
         }
         catch
@@ -269,6 +275,8 @@ public static class VmaHelpers
             return false;
         }
     }
+
+    public static bool IsLibVmaLoaded() => TryGetVmaApi(out _);
 
     /// <summary>
     /// Checks whether the provided socket is offloaded by VMA.
@@ -281,7 +289,7 @@ public static class VmaHelpers
         if (socket == null)
             throw new ArgumentNullException(nameof(socket));
 
-        if (!TryGetVmaApi(socket, out var api))
+        if (!TryGetVmaApi(out var api))
             return false;
 
         try
