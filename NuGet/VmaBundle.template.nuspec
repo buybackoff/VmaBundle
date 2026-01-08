@@ -3,12 +3,19 @@
     <id>VmaBundle.$distro$</id>
     <version>$version$</version>
     <authors>Victor Baybekov</authors>
-    <copyright>Copyright © 2025 Victor Baybekov</copyright>
-    <description>Userspace VMA bundle for Debian family distros.</description>
+    <owners>Victor Baybekov</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">GPL-2.0-or-later</license>
+    <projectUrl>https://github.com/buybackoff/VmaBundle</projectUrl>
+    <readme>docs\Readme.md</readme>
+    <description>Userspace VMA bundle for Debian family distros. This package provides pre-built VMA libraries and dependencies for high-performance networking on Linux. Individual component licenses are included in the package.</description>
+    <copyright>Copyright © 2026 Victor Baybekov</copyright>
+    <tags>vma networking rdma infiniband linux debian ubuntu performance</tags>
+    <repository type="git" url="https://github.com/buybackoff/VmaBundle" />
   </metadata>
 
   <files>
+    <file src="..\Readme.md" target="docs\" />
     <file src="VmaBundle.targets" target="buildTransitive\VmaBundle.$distro$.targets" />
     <file src="..\output\$distro$\vma\**" target="vmabundle\$distro$\" />
   </files>
